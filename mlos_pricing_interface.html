@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLOS Pricing Interface • Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        :root {
+            --primary: #1e3a8a;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .font-display {
+            font-family: 'Space Grotesk', 'Inter', system_ui, sans-serif;
+            font-weight: 600;
+        }
+
+        .finance-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        }
+
+        .pricing-table {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+        }
+
+        .pricing-table th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .pricing-row {
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .pricing-row:hover {
+            background-color: #f8fafc;
+            transform: translateY(-1px);
+        }
+
+        .rate-badge {
+            font-family: 'Space Grotesk', system_ui, sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .point-value {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .metric-value {
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum";
+        }
+
+        .section-header {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #475569;
+            letter-spacing: 0.025em;
+        }
+
+        .modal {
+            animation: modalPopIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .toast {
+            animation: toastSlideIn 0.3s ease forwards;
+        }
+
+        .mortgage-grid {
+            background-image: 
+                linear-gradient(#e2e8f0 1px, transparent 1px),
+                linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.4;
+        }
+
+        .price-chip {
+            background: linear-gradient(90deg, #dbeafe, #bfdbfe);
+            color: #1e40af;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 1px 10px;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <!-- Header -->
+    <header class="finance-header text-white shadow-lg">
+        <div class="max-w-screen-2xl mx-auto">
+            <div class="px-8 py-5 flex items-center justify-between">
+                <div class="flex items-center gap-x-4">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-x-3">
+                        <div class="w-11 h-11 bg-white rounded-2xl flex items-center justify-center shadow-inner">
+                            <div class="w-8 h-8 bg-blue-900 rounded-xl flex items-center justify-center">
+                                <i class="fa-solid fa-chart-line text-white text-3xl"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="font-display text-3xl tracking-tighter font-semibold">MLOS</span>
+                            <span class="text-blue-200 text-sm font-medium tracking-[2px] ml-1">PRICING</span>
+                        </div>
+                    </div>
+                    <div class="hidden md:flex items-center gap-x-2 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-3xl text-sm">
+                        <div class="flex items-center gap-x-1.5">
+                            <i class="fa-solid fa-check-circle text-emerald-400"></i>
+                            <span class="font-medium text-sm">Live Pricing Connected</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-x-6">
+                    <!-- Status -->
+                    <div class="hidden lg:flex items-center gap-x-2 text-sm bg-white/10 px-4 py-2 rounded-3xl">
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                        <span class="font-medium">Rate Sheet Updated: Today 10:42 AM</span>
+                    </div>
+
+                    <!-- User -->
+                    <div class="flex items-center gap-x-3">
+                        <div class="text-right hidden md:block">
+                            <div class="text-sm font-semibold">Kevin A. Duffy</div>
+                            <div class="text-blue-200 text-xs">Senior Loan Officer • Rochester, MI</div>
+                        </div>
+                        <div class="w-9 h-9 bg-white/90 rounded-2xl overflow-hidden ring-2 ring-white/30">
+                            <img src="https://i.pravatar.cc/36?img=68" alt="Kevin Duffy" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Subheader / Context -->
+    <div class="max-w-screen-2xl mx-auto px-8 pt-6 pb-4">
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-y-3">
+            <div>
+                <div class="flex items-center gap-x-3">
+                    <h1 class="text-3xl font-semibold tracking-tight text-slate-900">Allowed Sell Pricing</h1>
+                    <div class="price-chip">
+                        <i class="fa-solid fa-shield-halved fa-sm"></i>
+                        <span class="font-bold">1.000 – 2.000 PTS</span>
+                    </div>
+                </div>
+                <p class="text-slate-600 mt-1.5 text-[15px]">
+                    Example pricing options MLOS Loan Officers are approved to sell. 
+                    All options shown are <span class="font-semibold text-slate-700">within the 1 to 2 point borrower cost range</span> in <span class="font-semibold">1/8th point (0.125)</span> increments.
+                </p>
+            </div>
+
+            <div class="flex items-center gap-x-2 text-sm">
+                <div class="bg-white shadow-sm border border-slate-200 rounded-3xl px-4 py-2 flex items-center gap-x-2 text-xs font-medium">
+                    <i class="fa-solid fa-calendar-check text-emerald-500"></i>
+                    <span>30-Day Lock • Standard</span>
+                </div>
+                <div class="bg-white shadow-sm border border-slate-200 rounded-3xl px-4 py-2 flex items-center gap-x-2 text-xs font-medium">
+                    <i class="fa-solid fa-building text-blue-600"></i>
+                    <span>Primary Residence</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="max-w-screen-2xl mx-auto px-8 pb-6">
+        <div class="bg-white border border-slate-200 shadow-sm rounded-3xl p-5">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-end">
+                
+                <!-- Loan Amount -->
+                <div class="md:col-span-5">
+                    <label class="section-header block mb-1.5">LOAN AMOUNT</label>
+                    <div class="relative">
+                        <div class="absolute left-4 top-1/2 -mt-2 text-slate-400">
+                            <i class="fa-solid fa-dollar-sign"></i>
+                        </div>
+                        <input 
+                            type="number" 
+                            id="loanAmount" 
+                            value="425000" 
+                            step="5000"
+                            class="w-full pl-9 pr-4 py-3 text-2xl font-semibold tracking-tighter border border-slate-300 focus:border-blue-600 outline-none rounded-2xl"
+                            oninput="updatePricing()">
+                        <div class="absolute right-4 top-1/2 -mt-2.5 text-xs font-medium text-slate-400">USD</div>
+                    </div>
+                    <div class="flex gap-2 mt-1.5">
+                        <button onclick="quickSetAmount(350000)" class="text-xs px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-2xl transition-colors"> $350k </button>
+                        <button onclick="quickSetAmount(425000)" class="text-xs px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-2xl transition-colors"> $425k </button>
+                        <button onclick="quickSetAmount(550000)" class="text-xs px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-2xl transition-colors"> $550k </button>
+                        <button onclick="quickSetAmount(750000)" class="text-xs px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-2xl transition-colors"> $750k </button>
+                    </div>
+                </div>
+
+                <!-- Term & Product -->
+                <div class="md:col-span-3">
+                    <label class="section-header block mb-1.5">PRODUCT</label>
+                    <div class="bg-slate-100 border border-slate-200 rounded-2xl px-4 py-[13px] flex items-center justify-between">
+                        <div>
+                            <span class="font-semibold text-slate-800">30-Year Fixed</span>
+                            <span class="ml-2 text-emerald-600 text-xs font-bold">CONV</span>
+                        </div>
+                        <i class="fa-solid fa-lock text-slate-400"></i>
+                    </div>
+                </div>
+
+                <!-- Credit Tier -->
+                <div class="md:col-span-4">
+                    <label class="section-header block mb-1.5">CREDIT TIER (ASSUMED)</label>
+                    <div class="flex items-center gap-x-2">
+                        <select id="creditTier" onchange="updatePricing()" class="flex-1 border border-slate-300 rounded-2xl px-4 py-3 text-sm font-medium focus:border-blue-600 outline-none">
+                            <option value="excellent">Excellent (780+ FICO) — Base Pricing</option>
+                            <option value="good">Good (740-779) — +0.125 pts</option>
+                            <option value="fair">Fair (700-739) — +0.375 pts</option>
+                        </select>
+                        <div class="text-[10px] text-center leading-tight text-slate-500 hidden xl:block">
+                            Live MLOS adjusts<br>margin automatically
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-screen-2xl mx-auto px-8 pb-8">
+        
+        <!-- Summary Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 mb-4 px-1">
+            <div class="flex items-center gap-x-4">
+                <div>
+                    <span class="text-sm text-slate-500">Showing</span>
+                    <span id="optionCount" class="font-bold text-xl text-slate-900 mx-1">9</span>
+                    <span class="text-sm text-slate-500">compliant pricing options</span>
+                </div>
+                <div class="hidden sm:block h-3 w-px bg-slate-300"></div>
+                <div class="text-xs px-3 py-1 bg-emerald-100 text-emerald-700 rounded-3xl font-medium flex items-center gap-x-1.5">
+                    <i class="fa-solid fa-check-double"></i>
+                    <span>All options within approved 1.000–2.000 pt sell range</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-x-2">
+                <button onclick="sortTable('rate-low')" 
+                        class="text-xs flex items-center gap-x-1.5 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 rounded-3xl text-slate-600 transition-colors">
+                    <i class="fa-solid fa-arrow-down-wide-short"></i>
+                    <span>Lowest Rate</span>
+                </button>
+                <button onclick="sortTable('points-low')" 
+                        class="text-xs flex items-center gap-x-1.5 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 rounded-3xl text-slate-600 transition-colors">
+                    <i class="fa-solid fa-sort-amount-down"></i>
+                    <span>Lowest Points</span>
+                </button>
+                <button onclick="resetSort()" 
+                        class="text-xs flex items-center gap-x-1.5 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 rounded-3xl text-slate-600 transition-colors">
+                    <i class="fa-solid fa-undo"></i>
+                    <span>Reset</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Pricing Table -->
+        <div class="pricing-table bg-white border border-slate-200 shadow-sm overflow-hidden">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-slate-200">
+                        <th class="px-6 py-4 text-left w-36">INTEREST RATE</th>
+                        <th class="px-6 py-4 text-left">POINTS CHARGED</th>
+                        <th class="px-6 py-4 text-right">POINTS COST</th>
+                        <th class="px-6 py-4 text-right">EST. MONTHLY P&amp;I</th>
+                        <th class="px-6 py-4 text-center w-48">COMPARISON</th>
+                        <th class="px-6 py-4 text-center w-28">ACTION</th>
+                    </tr>
+                </thead>
+                <tbody id="pricingTableBody" class="text-sm divide-y divide-slate-100">
+                    <!-- Populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer note -->
+        <div class="mt-4 px-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-y-2 text-xs text-slate-500">
+            <div class="flex items-center gap-x-2">
+                <i class="fa-solid fa-info-circle"></i>
+                <span>Pricing shown is example data for demonstration. In production MLOS this pulls live from the pricing engine with real-time investor bids, your approved margin, and credit-based adjustments.</span>
+            </div>
+            <div class="font-medium text-blue-700 hover:text-blue-800 cursor-pointer flex items-center gap-x-1" onclick="showRateSheetInfo()">
+                <span>View full rate sheet logic</span>
+                <i class="fa-solid fa-external-link-alt fa-xs"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quote Modal -->
+    <div id="quoteModal" onclick="if (event.target.id === 'quoteModal') hideQuoteModal()" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div onclick="event.stopImmediatePropagation()" class="modal bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden">
+            <!-- Modal Header -->
+            <div class="px-6 pt-6 pb-4 bg-slate-900 text-white flex items-center justify-between">
+                <div>
+                    <div class="text-xs tracking-[1.5px] text-blue-300 font-medium">MLOS QUOTE PREVIEW</div>
+                    <div id="modalRate" class="font-display text-4xl font-semibold tracking-tighter"></div>
+                </div>
+                <div class="text-right">
+                    <div id="modalPoints" class="text-2xl font-bold text-emerald-400"></div>
+                    <div class="text-xs text-slate-400 -mt-0.5">POINTS</div>
+                </div>
+            </div>
+
+            <div class="p-6 space-y-5">
+                <!-- Key metrics -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-50 rounded-2xl p-4">
+                        <div class="text-xs text-slate-500 mb-1">LOAN AMOUNT</div>
+                        <div id="modalLoanAmount" class="font-semibold text-2xl tracking-tighter text-slate-900"></div>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-4">
+                        <div class="text-xs text-slate-500 mb-1">POINTS DUE AT CLOSING</div>
+                        <div id="modalPointsCost" class="font-semibold text-2xl tracking-tighter text-emerald-700"></div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                    <div class="flex justify-between items-baseline">
+                        <div>
+                            <div class="text-xs text-slate-500">ESTIMATED MONTHLY PAYMENT</div>
+                            <div id="modalPayment" class="font-display text-4xl font-semibold tracking-tighter text-slate-900"></div>
+                            <div class="text-xs text-slate-500">Principal &amp; Interest only</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="inline-flex items-center gap-x-1 text-emerald-600 text-xs font-bold bg-emerald-50 px-2.5 py-1 rounded-2xl">
+                                <i class="fa-solid fa-arrow-trend-down"></i>
+                                <span id="modalSavings"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-xs bg-blue-50 border border-blue-100 text-blue-700 px-4 py-3 rounded-2xl flex gap-x-3">
+                    <i class="fa-solid fa-shield-halved mt-0.5 flex-shrink-0"></i>
+                    <div>
+                        This pricing is <strong>within your approved 1–2 point sell range</strong> and compliant with current MLOS guidelines. 
+                        Secondary market price: <span id="modalSecondaryPrice" class="font-mono font-bold"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="px-6 pb-6 pt-2 flex flex-col sm:flex-row gap-3">
+                <button onclick="simulateAction('lock')" 
+                        class="flex-1 bg-blue-900 hover:bg-blue-950 transition-colors text-white font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-x-2 text-sm">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>LOCK THIS PRICING</span>
+                </button>
+                <button onclick="simulateAction('email')" 
+                        class="flex-1 border border-slate-300 hover:bg-slate-50 transition-colors font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-x-2 text-sm text-slate-700">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span>EMAIL QUOTE</span>
+                </button>
+                <button onclick="simulateAction('los')" 
+                        class="flex-1 border border-slate-300 hover:bg-slate-50 transition-colors font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-x-2 text-sm text-slate-700">
+                    <i class="fa-solid fa-file-import"></i>
+                    <span>SEND TO LOS</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-[60] flex flex-col gap-y-2"></div>
+
+    <script>
+        // Tailwind script
+        function initTailwind() {
+            document.documentElement.style.setProperty('--accent', '#1e40af');
+            
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            'display': ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif']
+                        }
+                    }
+                }
+            };
+        }
+
+        // Sample pricing data - realistic example within 1.000 - 2.000 pts
+        // Higher points = lower rate (borrower buys down the rate)
+        let pricingData = [
+            { id: 1, points: 1.000, rate: 6.750 },
+            { id: 2, points: 1.125, rate: 6.625 },
+            { id: 3, points: 1.250, rate: 6.500 },
+            { id: 4, points: 1.375, rate: 6.375 },
+            { id: 5, points: 1.500, rate: 6.250 },
+            { id: 6, points: 1.625, rate: 6.125 },
+            { id: 7, points: 1.750, rate: 6.000 },
+            { id: 8, points: 1.875, rate: 5.875 },
+            { id: 9, points: 2.000, rate: 5.750 }
+        ];
+
+        let currentSort = null;
+        let currentData = [...pricingData];
+
+        // Mortgage payment calculation
+        function calculateMonthlyPayment(principal, annualRatePercent, years = 30) {
+            if (!principal || principal <= 0) return 0;
+            
+            const monthlyRate = (annualRatePercent / 100) / 12;
+            const numPayments = years * 12;
+            
+            if (monthlyRate === 0) {
+                return principal / numPayments;
+            }
+            
+            const payment = principal * 
+                (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+                (Math.pow(1 + monthlyRate, numPayments) - 1);
+            
+            return payment;
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function formatCurrencyExact(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(amount);
+        }
+
+        // Get current loan amount
+        function getLoanAmount() {
+            const input = document.getElementById('loanAmount');
+            return parseFloat(input.value) || 425000;
+        }
+
+        // Apply credit tier adjustment (simulated)
+        function getAdjustedRate(baseRate) {
+            const tier = document.getElementById('creditTier').value;
+            let adjustment = 0;
+            
+            if (tier === 'good') adjustment = 0.125;
+            else if (tier === 'fair') adjustment = 0.375;
+            
+            return baseRate + adjustment;
+        }
+
+        // Render the pricing table
+        function renderPricingTable(data = currentData) {
+            const tbody = document.getElementById('pricingTableBody');
+            tbody.innerHTML = '';
+            
+            const loanAmount = getLoanAmount();
+            const tier = document.getElementById('creditTier').value;
+            
+            data.forEach(item => {
+                const adjustedRate = getAdjustedRate(item.rate);
+                const monthlyPayment = calculateMonthlyPayment(loanAmount, adjustedRate);
+                const pointsCost = (item.points / 100) * loanAmount;
+                
+                // Rough APR estimate (points amortized roughly)
+                const aprEstimate = adjustedRate + (item.points * 0.08); // simplistic
+                
+                const row = document.createElement('tr');
+                row.className = `pricing-row border-b border-slate-100 last:border-0 hover:bg-slate-50`;
+                
+                // Comparison text (savings vs highest rate option)
+                const highestRatePayment = calculateMonthlyPayment(loanAmount, getAdjustedRate(6.750));
+                const monthlySavings = highestRatePayment - monthlyPayment;
+                const savingsText = monthlySavings > 0 
+                    ? `Save $${Math.round(monthlySavings)}/mo vs 6.750%` 
+                    : 'Highest rate option';
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4">
+                        <div class="flex items-baseline gap-x-2">
+                            <span class="rate-badge text-3xl font-bold tracking-tighter text-slate-900">${adjustedRate.toFixed(3)}</span>
+                            <span class="text-xs font-bold text-slate-400">%</span>
+                        </div>
+                        <div class="text-[10px] text-slate-500 -mt-0.5">30yr Fixed</div>
+                    </td>
+                    
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-x-2">
+                            <span class="inline-flex items-center justify-center bg-emerald-100 text-emerald-700 font-bold text-lg px-3.5 py-1 rounded-2xl point-value">
+                                ${item.points.toFixed(3)}
+                            </span>
+                            <span class="text-xs font-medium text-emerald-600">pts</span>
+                        </div>
+                    </td>
+                    
+                    <td class="px-6 py-4 text-right">
+                        <div class="font-semibold text-lg text-emerald-700 metric-value">${formatCurrency(pointsCost)}</div>
+                        <div class="text-[10px] text-slate-500">due at closing</div>
+                    </td>
+                    
+                    <td class="px-6 py-4 text-right">
+                        <div class="font-display font-semibold text-2xl tracking-tighter text-slate-900 metric-value">
+                            ${formatCurrencyExact(monthlyPayment)}
+                        </div>
+                        <div class="text-[10px] text-slate-500">/ month</div>
+                    </td>
+                    
+                    <td class="px-6 py-4">
+                        <div class="text-center">
+                            <div class="inline-flex items-center text-xs px-3 py-1 bg-slate-100 text-slate-600 rounded-2xl">
+                                <i class="fa-solid fa-piggy-bank mr-1.5 text-emerald-500"></i>
+                                <span class="font-medium">${savingsText}</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="showQuoteModal(${item.id}, ${item.points}, ${item.rate}, ${adjustedRate}, ${monthlyPayment}, ${pointsCost})"
+                                class="px-5 py-2 text-xs font-bold bg-blue-900 hover:bg-blue-950 active:bg-black transition-all text-white rounded-2xl flex items-center gap-x-2 mx-auto">
+                            <span>QUOTE</span>
+                            <i class="fa-solid fa-arrow-right fa-sm"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // Update count
+            document.getElementById('optionCount').textContent = data.length;
+        }
+
+        // Update everything when inputs change
+        function updatePricing() {
+            const loanAmount = getLoanAmount();
+            
+            // Re-render with current sort
+            let dataToShow = [...pricingData];
+            
+            if (currentSort === 'rate-low') {
+                dataToShow.sort((a, b) => getAdjustedRate(a.rate) - getAdjustedRate(b.rate));
+            } else if (currentSort === 'points-low') {
+                dataToShow.sort((a, b) => a.points - b.points);
+            }
+            
+            currentData = dataToShow;
+            renderPricingTable(currentData);
+        }
+
+        // Quick set loan amount buttons
+        function quickSetAmount(amount) {
+            const input = document.getElementById('loanAmount');
+            input.value = amount;
+            updatePricing();
+        }
+
+        // Sorting functions
+        function sortTable(type) {
+            currentSort = type;
+            let sorted = [...pricingData];
+            
+            if (type === 'rate-low') {
+                sorted.sort((a, b) => getAdjustedRate(a.rate) - getAdjustedRate(b.rate));
+            } else if (type === 'points-low') {
+                sorted.sort((a, b) => a.points - b.points);
+            }
+            
+            currentData = sorted;
+            renderPricingTable(currentData);
+        }
+
+        function resetSort() {
+            currentSort = null;
+            currentData = [...pricingData];
+            renderPricingTable(currentData);
+        }
+
+        // Show quote modal
+        function showQuoteModal(id, points, baseRate, adjustedRate, monthlyPayment, pointsCost) {
+            const modal = document.getElementById('quoteModal');
+            const loanAmount = getLoanAmount();
+            
+            // Populate modal
+            document.getElementById('modalRate').innerHTML = `${adjustedRate.toFixed(3)}<span class="text-2xl align-super font-normal">%</span>`;
+            document.getElementById('modalPoints').innerHTML = `${points.toFixed(3)} <span class="text-sm font-normal text-emerald-300">PTS</span>`;
+            
+            document.getElementById('modalLoanAmount').innerHTML = formatCurrency(loanAmount);
+            document.getElementById('modalPointsCost').innerHTML = formatCurrency(pointsCost);
+            document.getElementById('modalPayment').innerHTML = formatCurrencyExact(monthlyPayment);
+            
+            // Secondary price example (illustrative)
+            const secondaryPrice = (100 - (points * 0.65)).toFixed(3);
+            document.getElementById('modalSecondaryPrice').innerHTML = `${secondaryPrice}`;
+            
+            // Savings vs worst case
+            const worstPayment = calculateMonthlyPayment(loanAmount, getAdjustedRate(6.750));
+            const savings = worstPayment - monthlyPayment;
+            document.getElementById('modalSavings').innerHTML = `Save ~$${Math.round(savings)}/mo`;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function hideQuoteModal() {
+            const modal = document.getElementById('quoteModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        // Simulate button actions in modal
+        function simulateAction(action) {
+            const modal = document.getElementById('quoteModal');
+            hideQuoteModal();
+            
+            let message = '';
+            let icon = 'fa-check-circle';
+            let color = 'emerald';
+            
+            if (action === 'lock') {
+                message = 'Pricing locked successfully for 30 days. Confirmation sent to borrower portal.';
+                icon = 'fa-lock';
+            } else if (action === 'email') {
+                message = 'Quote email sent to borrower. They can review and e-sign from the secure link.';
+                icon = 'fa-envelope';
+            } else if (action === 'los') {
+                message = 'Pricing package sent to MLOS origination system. Loan file updated.';
+                icon = 'fa-file-import';
+            }
+            
+            showToast(message, icon, color);
+            
+            // Bonus: show a fake "next step" toast after delay
+            if (action === 'lock') {
+                setTimeout(() => {
+                    showToast('Next: Upload initial disclosures from the eFolder.', 'fa-folder-open', 'blue');
+                }, 2200);
+            }
+        }
+
+        // Toast notification
+        function showToast(message, icon = 'fa-check-circle', color = 'emerald') {
+            const container = document.getElementById('toastContainer');
+            
+            const toast = document.createElement('div');
+            toast.className = `toast flex items-start gap-x-3 bg-white border border-slate-200 shadow-xl rounded-2xl p-4 max-w-sm`;
+            
+            toast.innerHTML = `
+                <div class="mt-0.5">
+                    <i class="fa-solid ${icon} text-${color}-500 text-xl"></i>
+                </div>
+                <div class="flex-1 text-sm leading-snug text-slate-700 pr-1">
+                    ${message}
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600 mt-0.5">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Auto remove after 5.5s
+            setTimeout(() => {
+                if (toast.parentElement) toast.parentElement.removeChild(toast);
+            }, 5500);
+        }
+
+        // Info modal for rate sheet explanation
+        function showRateSheetInfo() {
+            const infoHTML = `
+                <div class="fixed inset-0 bg-black/70 backdrop-blur z-[70] flex items-center justify-center p-6" onclick="this.remove()">
+                    <div onclick="event.stopImmediatePropagation()" class="max-w-md bg-white rounded-3xl p-7">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span class="font-bold text-xl">How MLOS Pricing Works</span>
+                            </div>
+                            <button onclick="event.target.closest('.fixed').remove()" class="text-2xl leading-none text-slate-400 hover:text-slate-600">×</button>
+                        </div>
+                        
+                        <div class="space-y-4 text-sm text-slate-600">
+                            <p><strong>1–2 Point Range:</strong> Your approved sell window. You may quote any rate/point combination where the borrower cost is between 1.000 and 2.000 points.</p>
+                            
+                            <p><strong>1/8th Point Increments:</strong> All pricing must be presented in 0.125 increments per investor and compliance guidelines.</p>
+                            
+                            <p><strong>Rate / Points Relationship:</strong> Higher points paid by borrower = lower interest rate. The rate sheet engine calculates the exact rate available at each point level based on current secondary market pricing + your margin.</p>
+                            
+                            <div class="bg-slate-50 border border-slate-100 p-3 rounded-2xl text-xs">
+                                <strong class="text-slate-700">Example logic:</strong><br>
+                                Base par rate (0 pts) ≈ 7.000%. Each 0.125 pt ≈ 0.125% rate reduction (varies daily with market).
+                            </div>
+                            
+                            <p class="text-xs text-slate-500 pt-2">In the live MLOS system this data is pulled in real-time from the pricing service and filtered to only show options inside your authorized range.</p>
+                        </div>
+                        
+                        <button onclick="event.target.closest('.fixed').remove()" 
+                                class="mt-6 w-full py-3 text-sm font-semibold bg-slate-900 text-white rounded-2xl">Got it</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', infoHTML);
+        }
+
+        // Initialize everything
+        function initializeInterface() {
+            initTailwind();
+            
+            // Set initial loan amount formatting hint
+            const loanInput = document.getElementById('loanAmount');
+            
+            // Initial render
+            renderPricingTable(pricingData);
+            
+            // Live update on loan amount change (with slight debounce feel)
+            let timeout = null;
+            loanInput.addEventListener('input', () => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    updatePricing();
+                }, 120);
+            });
+            
+            // Credit tier change
+            document.getElementById('creditTier').addEventListener('change', () => {
+                updatePricing();
+            });
+            
+            // Keyboard support: press "/" to focus loan amount
+            document.addEventListener('keydown', function(e) {
+                if (e.key === '/' && document.activeElement.tagName === 'BODY') {
+                    e.preventDefault();
+                    loanInput.focus();
+                    loanInput.select();
+                }
+            });
+            
+            // Welcome toast on first load (demo feel)
+            setTimeout(() => {
+                // Only show once per session in this context
+                if (!sessionStorage.getItem('mlos_welcomed')) {
+                    // showToast('Welcome back, Kevin. Live pricing is connected to the engine.', 'fa-sync', 'blue');
+                    sessionStorage.setItem('mlos_welcomed', 'true');
+                }
+            }, 1800);
+            
+            // Make sure initial state is clean
+            currentData = [...pricingData];
+            
+            // Bonus: show a subtle helper if user hasn't interacted
+            console.log('%c[MLOS Demo] Pricing interface initialized successfully. All 9 options are within the 1.000–2.000 point allowed sell range.', 'color:#64748b');
+        }
+
+        // Boot the app
+        window.onload = initializeInterface;
+    </script>
+</body>
+</html>
